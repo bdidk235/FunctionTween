@@ -1,0 +1,16 @@
+{
+	"editor.insertSpaces": false,
+	"editor.formatOnSave": true,
+	"files.eol": "\n",
+	"luau-lsp.ignoreGlobs": ["**/_Index/**"],
+	"luau-lsp.diagnostics.strictDatamodelTypes": true,
+	"luau-lsp.diagnostics.workspace": true,
+	"luau-lsp.fflags.enableByDefault": true,
+	"luau-lsp.sourcemap.rojoProjectFile": "serve.project.json",
+	"[lua]": {
+		"editor.defaultFormatter": "JohnnyMorganz.stylua"
+	},
+	"[luau]": {
+		"editor.defaultFormatter": "JohnnyMorganz.stylua"
+	}
+}

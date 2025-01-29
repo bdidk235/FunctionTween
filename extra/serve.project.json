@@ -1,0 +1,13 @@
+{
+	"name": "functiontween-serve",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"$path": "Packages",
+			"functiontween": {
+				"$path": "default.project.json"
+			}
+		}
+	}
+}

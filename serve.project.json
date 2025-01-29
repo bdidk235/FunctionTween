@@ -1,0 +1,16 @@
+{
+	"name": "functiontween-serve",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"$path": "Packages",
+			"FunctionTween": {
+				"$path": "default.project.json"
+			},
+			"PhysicsTween": {
+				"$path": "extra/PhysicsTween/default.project.json"
+			}
+		}
+	}
+}
