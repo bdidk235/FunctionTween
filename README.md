@@ -27,11 +27,27 @@ tween.Play(0, 1)
 Creates a new `FunctionTween` table.
 
 ```lua
+local RunService = game:GetService("RunService")
+
 local FunctionTween = require(path.to.FunctionTween)
 
-local tween = FunctionTween.new(function(t)
-	PartToMove:PivotTo(StartingPivot:Lerp(GoalPivot, t))
-end, TweenInfo.new(1))
+local easingFunction = function(x: number)
+	return (x ^ 2) / 2
+end
+
+local tween = FunctionTween.new(
+	-- The function to tween
+	function(t)
+		PartToMove:PivotTo(StartingPivot:Lerp(GoalPivot, t))
+	end,
+	-- Can be a `TweenInfo` or a table with `TweenInfo` and `EasingFunction`
+	{
+		TweenInfo = TweenInfo.new(1),
+		EasingFunction = easingFunction
+	},
+	-- What to update the function on
+	RunService.Stepped
+)
 ```
 
 ### New FunctionTween
@@ -43,7 +59,14 @@ Functions
 Plays the tween.
 
 ```lua
-tween.Play(0, 1)
+tween.Play(
+	-- Start number
+	0,
+	-- End number
+	1,
+	-- Can be extended like `.new`'s TweenInfo
+	TweenInfo.new(1)
+)
 ```
 
 #### tween.Pause

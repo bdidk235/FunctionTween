@@ -99,6 +99,7 @@ local function new(
 				local function tweenCallback(arg1: number, arg2: number?)
 					if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
 
+					-- TODO: Get deltaTime manually
 					local deltaTime = arg1
 					-- RunService.Stepped is a special case
 					if arg2 and tweenSignal == RunService.Stepped then deltaTime = arg2 end
