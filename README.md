@@ -45,7 +45,7 @@ local tween = FunctionTween.new(
 		TweenInfo = TweenInfo.new(1),
 		EasingFunction = easingFunction
 	},
-	-- What to update the function on
+	-- What to update the function on (Based on MethodTween)
 	RunService.Stepped
 )
 ```

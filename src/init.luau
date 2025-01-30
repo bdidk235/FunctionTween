@@ -56,6 +56,7 @@ local function new(
 
 	local currentTween = nil :: Tween?
 	local cancelFunc = nil :: (() -> ())?
+	local delayedThread: thread?
 
 	--[[
 		Plays the tween.
@@ -85,8 +86,16 @@ local function new(
 			self.PlaybackState = actualTweenInfo.DelayTime > 0 and Enum.PlaybackState.Delayed
 				or Enum.PlaybackState.Playing
 
+			local cancelDelayedThread = function()
+				if delayedThread then
+					if coroutine.status(delayedThread) == "suspended" then task.cancel(delayedThread) end
+					delayedThread = nil
+				end
+			end
+
+			cancelFunc = cancelDelayedThread
+
 			-- Thanks to MethodTween for figuring this out
-			local delayedThread: thread?
 			delayedThread = delayCallback(actualTweenInfo.DelayTime, function()
 				self.PlaybackState = Enum.PlaybackState.Playing
 
@@ -123,13 +132,6 @@ local function new(
 							if cancelFunc then cancelFunc() end
 							cancelFunc = nil
 						end
-					end
-				end
-
-				local cancelDelayedThread = function()
-					if delayedThread then
-						if coroutine.status(delayedThread) == "suspended" then task.cancel(delayedThread) end
-						delayedThread = nil
 					end
 				end
 
@@ -191,7 +193,7 @@ local function new(
 			end)
 
 			local tweenCompleted
-			tweenCompleted = tween.Completed:Connect(function()
+			tweenCompleted = tween.Completed:Connect(function(playbackState)
 				currentTween = nil
 				cancelFunc = nil
 
@@ -201,7 +203,7 @@ local function new(
 				valueChanged:Disconnect()
 				temporaryValue:Destroy()
 
-				self.Completed:Fire(self.PlaybackState)
+				self.Completed:Fire(playbackState)
 			end)
 			cancelFunc = function()
 				tween:Cancel() -- Fires tween.Completed
