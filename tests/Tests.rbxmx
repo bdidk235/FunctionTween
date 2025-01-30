@@ -985,7 +985,7 @@ tween.Play(0, 1)
 						<token name="SizeConstraint">0</token>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<string name="Text">Moving Part&lt;br/&gt;with FunctionTween</string>
+						<string name="Text">Moving Part&lt;br/&gt;with Easing Function</string>
 						<Color3 name="TextColor3">
 							<R>0</R>
 							<G>0</G>
