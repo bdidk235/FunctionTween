@@ -2,6 +2,8 @@
 
 Tween whatever you want, however you want.
 
+[Roblox Model](https://create.roblox.com/store/asset/119180526446463/FunctionTween) | [Wally](https://wally.run/package/bdidk235/functiontween) | [Github Release](https://github.com/bdidk235/FunctionTween/releases/latest)
+
 ## Usage
 
 A simple example for moving a part, using `PivotTo`.
