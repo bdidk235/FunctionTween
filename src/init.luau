@@ -65,7 +65,7 @@ local function new(
 		self.PlaybackState = Enum.PlaybackState.Begin
 
 		if cancelFunc then
-			if cancelFunc then cancelFunc() end
+			cancelFunc()
 			cancelFunc = nil
 		end
 
@@ -107,15 +107,16 @@ local function new(
 				local function tweenCallback()
 					if self.PlaybackState == Enum.PlaybackState.Cancelled then return end
 					if self.PlaybackState == Enum.PlaybackState.Completed then return end
-					if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
 
 					local currentFrameTime = os.clock()
 					local deltaTime = currentFrameTime - lastFrameTime
 					lastFrameTime = currentFrameTime
 
+					if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
+
 					_time += deltaTime
 
-					local alpha = math.min(_time / actualTweenInfo.Time - repeatCount, 1)
+					local alpha = math.min(_time / actualTweenInfo.Time - timesRepeated, 1)
 					local tweenAlpha = easingFunction(alpha)
 					if actualTweenInfo.Reverses and timesRepeated % 2 == 1 then tweenAlpha = 1 - tweenAlpha end
 
@@ -129,7 +130,7 @@ local function new(
 					if timesRepeated >= repeatCount and actualTweenInfo.RepeatCount >= 0 then
 						self.PlaybackState = Enum.PlaybackState.Completed
 						if cancelFunc then
-							if cancelFunc then cancelFunc() end
+							cancelFunc()
 							cancelFunc = nil
 						end
 					end
