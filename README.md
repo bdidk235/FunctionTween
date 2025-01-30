@@ -120,12 +120,11 @@ Equivalent to `TweenService:Create`
 ```luau
 local PartToMove = workspace.PartToMove
 
-local tween = FunctionTween.new(
-	FunctionTween.InstanceProps(
-		PartToMove,
-		{ CFrame = PartToMove.CFrame * CFrame.new(0, 0, 10) }
-	)
+local tweenFunc = FunctionTween.InstanceProps(
+	PartToMove,
+	{ CFrame = PartToMove.CFrame * CFrame.new(0, 0, 10) }
 )
+local tween = FunctionTween.new(tweenFunc)
 ```
 
 #### FunctionTween.InstanceMethods
@@ -138,12 +137,11 @@ local PartToMove = workspace.PartToMove
 local StartingPivot = PartToMove:GetPivot()
 local GoalPivot = StartingPivot * CFrame.new(0, 0, 10)
 
-local tween = FunctionTween.new(
-	FunctionTween.InstanceMethods(
-		workspace.PartToMove,
-		{ PivotTo = { StartingPivot, GoalPivot } }
-	)
+local tweenFunc = FunctionTween.InstanceMethods(
+	workspace.PartToMove,
+	{ PivotTo = { StartingPivot, GoalPivot } }
 )
+local tween = FunctionTween.new(tweenFunc)
 ```
 
 </details>
