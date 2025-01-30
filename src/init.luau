@@ -10,7 +10,7 @@ type Signal<T...> = Signal.Signal<T...>
 function lerp(a: number, b: number, t: number)
 	return a * (1 - t) + b * t
 end
-local function delayCallback(delayTime, callback: () -> (), ...: any): thread?
+local function delayCallback(delayTime: number, callback: () -> (), ...: any): thread?
 	if delayTime == 0 then
 		return callback(...)
 	else
@@ -67,15 +67,11 @@ local function new(
 		end
 
 		local actualTweenInfo = (
-			if typeof(tweenInfo) == "table"
-					and (typeof(tweenInfo.TweenInfo) == "Instance" and tweenInfo.TweenInfo:IsA("TweenInfo"))
+			if typeof(tweenInfo) == "table" and typeof(tweenInfo.TweenInfo) == "TweenInfo"
 				then tweenInfo.TweenInfo
 				else tweenInfo
 		) or initialTweenInfo
-		assert(
-			typeof(actualTweenInfo) == "Instance" and actualTweenInfo:IsA("TweenInfo"),
-			"TweenInfo is missing, add TweenInfo to '.Play' or '.new'."
-		)
+		assert(typeof(actualTweenInfo) == "TweenInfo", "TweenInfo is missing, add TweenInfo to '.Play' or '.new'.")
 
 		local easingFunction = function(alpha: number)
 			return TweenService:GetValue(alpha, actualTweenInfo.EasingStyle, actualTweenInfo.EasingDirection)

@@ -11,6 +11,21 @@
 			"PhysicsTween": {
 				"$path": "extra/PhysicsTween/default.project.json"
 			}
+		},
+		"Workspace": {
+			"$className": "ReplicatedStorage",
+			"Models": {
+				"$className": "Folder",
+				"FunctionTween": {
+					"$path": "models/FunctionTweenPackage.luau",
+					"Package": {
+						"$path": "Packages",
+						"FunctionTween": {
+							"$path": "default.project.json"
+						}
+					}
+				}
+			}
 		}
 	}
 }

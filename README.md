@@ -119,7 +119,7 @@ Equivalent to `TweenService:Create`
 local PartToMove = workspace.PartToMove
 
 local tween = FunctionTween.new(
-	InstanceProps(
+	FunctionTween.InstanceProps(
 		PartToMove,
 		{ CFrame = PartToMove.CFrame * CFrame.new(0, 0, 10) }
 	)
@@ -137,7 +137,7 @@ local StartingPivot = PartToMove:GetPivot()
 local GoalPivot = StartingPivot * CFrame.new(0, 0, 10)
 
 local tween = FunctionTween.new(
-	InstanceMethods(
+	FunctionTween.InstanceMethods(
 		workspace.PartToMove,
 		{ PivotTo = { StartingPivot, GoalPivot } }
 	)
