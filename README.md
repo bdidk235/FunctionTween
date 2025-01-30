@@ -6,7 +6,7 @@ Tween whatever you want, however you want.
 
 A simple example for moving a part, using `PivotTo`.
 
-```lua
+```luau
 local FunctionTween = require(path.to.FunctionTween)
 
 local PartToMove = workspace.PartToMove
@@ -20,13 +20,13 @@ end, TweenInfo.new(1))
 tween.Play(0, 1)
 ```
 
-## API
+<details> <summary> <b>API Reference</b> </summary>
 
 ### FunctionTween.new
 
 Creates a new `FunctionTween` table.
 
-```lua
+```luau
 local RunService = game:GetService("RunService")
 
 local FunctionTween = require(path.to.FunctionTween)
@@ -58,7 +58,7 @@ local tween = FunctionTween.new(
 
 Plays the tween.
 
-```lua
+```luau
 tween.Play(
 	-- Start number
 	0,
@@ -73,7 +73,7 @@ tween.Play(
 
 Pauses the tween.
 
-```lua
+```luau
 tween.Pause()
 ```
 
@@ -81,7 +81,7 @@ tween.Pause()
 
 Resumes the tween after it was paused.
 
-```lua
+```luau
 tween.Resume()
 ```
 
@@ -89,7 +89,7 @@ tween.Resume()
 
 Cancels the tween, it cannot be resumed.
 
-```lua
+```luau
 tween.Cancel()
 ```
 
@@ -103,7 +103,7 @@ The playback state of the tween.
 
 Fires when the tween is completed.
 
-```lua
+```luau
 tween.Play(0, 1)
 tween.Completed:Wait()
 print("Tween completed!")
@@ -115,7 +115,7 @@ print("Tween completed!")
 
 Equivalent to `TweenService:Create`
 
-```lua
+```luau
 local PartToMove = workspace.PartToMove
 
 local tween = FunctionTween.new(
@@ -130,7 +130,7 @@ local tween = FunctionTween.new(
 
 Equivalent to `MethodTween.new`
 
-```lua
+```luau
 local PartToMove = workspace.PartToMove
 
 local StartingPivot = PartToMove:GetPivot()
@@ -143,3 +143,11 @@ local tween = FunctionTween.new(
 	)
 )
 ```
+
+</details>
+
+## Contributing
+
+You will need [Rokit](https://github.com/rojo-rbx/rokit) (or [Aftman](https://github.com/LPGhatguy/aftman)) to install tools.
+
+You can `rojo serve serve.project.json` to a Baseplate for Tests in Workspace, and Packages in ReplicatedStorage.
