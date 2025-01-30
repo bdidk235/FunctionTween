@@ -1,5 +1,7 @@
 --[[
 	FunctionTween - Tween whatever you want, however you want.
+
+	Repository: https://github.com/bdidk235/FunctionTween
 ]]
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -17,6 +19,11 @@ local function delayCallback(delayTime: number, callback: () -> (), ...: any): t
 		return task.delay(delayTime, callback, ...)
 	end
 end
+
+export type TweenSignal =
+	RBXScriptSignal<number>
+	| { Connect: (self: any, callback: (number) -> ()) -> any }
+	| { RenderStepName: string, RenderPriority: number }
 
 export type ExtendedTweenInfo = TweenInfo | {
 	TweenInfo: TweenInfo,
@@ -40,11 +47,7 @@ export type FunctionTween = {
 local function new(
 	func: (value: number, deltaTime: number) -> (),
 	initialTweenInfo: ExtendedTweenInfo?,
-	tweenSignal: (
-		RBXScriptSignal<number>
-		| { Connect: (self: any, callback: (number) -> ()) -> any }
-		| { RenderStepName: string, RenderPriority: number }
-	)?
+	tweenSignal: TweenSignal?
 )
 	local self = {
 		PlaybackState = Enum.PlaybackState.Begin,
@@ -53,7 +56,6 @@ local function new(
 
 	local currentTween = nil :: Tween?
 	local cancelFunc = nil :: (() -> ())?
-	local delayedThread = nil :: thread?
 
 	--[[
 		Plays the tween.
@@ -66,11 +68,10 @@ local function new(
 			cancelFunc = nil
 		end
 
-		local actualTweenInfo = (
-			if typeof(tweenInfo) == "table" and typeof(tweenInfo.TweenInfo) == "TweenInfo"
-				then tweenInfo.TweenInfo
-				else tweenInfo
-		) or initialTweenInfo
+		tweenInfo = tweenInfo or initialTweenInfo
+		local actualTweenInfo = if typeof(tweenInfo) == "table" and typeof(tweenInfo.TweenInfo) == "TweenInfo"
+			then tweenInfo.TweenInfo
+			else tweenInfo
 		assert(typeof(actualTweenInfo) == "TweenInfo", "TweenInfo is missing, add TweenInfo to '.Play' or '.new'.")
 
 		local easingFunction = function(alpha: number)
@@ -85,6 +86,7 @@ local function new(
 				or Enum.PlaybackState.Playing
 
 			-- Thanks to MethodTween for figuring this out
+			local delayedThread: thread?
 			delayedThread = delayCallback(actualTweenInfo.DelayTime, function()
 				self.PlaybackState = Enum.PlaybackState.Playing
 
@@ -92,27 +94,30 @@ local function new(
 				local timesRepeated = 0
 
 				local _time = 0
-				local function tweenCallback(arg1: number, arg2: number?)
+				local lastFrameTime = 0
+				local function tweenCallback()
+					if self.PlaybackState == Enum.PlaybackState.Cancelled then return end
+					if self.PlaybackState == Enum.PlaybackState.Completed then return end
 					if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
 
-					-- TODO: Get deltaTime manually
-					local deltaTime = arg1
-					-- RunService.Stepped is a special case
-					if arg2 and tweenSignal == RunService.Stepped then deltaTime = arg2 end
+					local currentFrameTime = os.clock()
+					local deltaTime = currentFrameTime - lastFrameTime
+					lastFrameTime = currentFrameTime
 
 					_time += deltaTime
 
-					local alpha = math.min(_time / actualTweenInfo.Time - timesRepeated, 1)
+					local alpha = math.min(_time / actualTweenInfo.Time - repeatCount, 1)
 					local tweenAlpha = easingFunction(alpha)
 					if actualTweenInfo.Reverses and timesRepeated % 2 == 1 then tweenAlpha = 1 - tweenAlpha end
 
 					func(lerp(startValue, endValue, tweenAlpha), deltaTime)
 
+					-- TODO: Make repeating more accurate to TweenService
 					if alpha >= 1 then
 						timesRepeated += 1
 					end
 
-					if timesRepeated >= repeatCount then
+					if timesRepeated >= repeatCount and actualTweenInfo.RepeatCount >= 0 then
 						self.PlaybackState = Enum.PlaybackState.Completed
 						if cancelFunc then
 							if cancelFunc then cancelFunc() end
@@ -121,6 +126,14 @@ local function new(
 					end
 				end
 
+				local cancelDelayedThread = function()
+					if delayedThread then
+						if coroutine.status(delayedThread) == "suspended" then task.cancel(delayedThread) end
+						delayedThread = nil
+					end
+				end
+
+				lastFrameTime = os.clock()
 				if typeof(tweenSignal) == "table" and (tweenSignal :: any).RenderStepName then
 					RunService:BindToRenderStep(
 						(tweenSignal :: any).RenderStepName,
@@ -129,6 +142,7 @@ local function new(
 					)
 					cancelFunc = function()
 						RunService:UnbindFromRenderStep((tweenSignal :: any).RenderStepName)
+						cancelDelayedThread()
 					end
 				else
 					local connection = (tweenSignal :: any):Connect(tweenCallback)
@@ -137,6 +151,7 @@ local function new(
 						cancelFunc = nil
 
 						self.Completed:Fire(self.PlaybackState)
+						cancelDelayedThread()
 					end
 				end
 			end)
@@ -233,10 +248,6 @@ local function new(
 			cancelFunc()
 			cancelFunc = nil
 		end
-		if delayedThread then
-			if coroutine.status(delayedThread) == "suspended" then task.cancel(delayedThread) end
-			delayedThread = nil
-		end
 	end
 
 	self.Play = play
@@ -278,11 +289,11 @@ end
 
 --[[
 	Equivalent to `TweenService:Create`:
-	- `TweenService:Create`: `
+	- `TweenService:Create(instance, tweenInfo, props)`: `
 	local tweenFunc = FunctionTween.InstanceProps(instance, props)
 	local tween = FunctionTween.new(tweenFunc, tweenInfo)
 	`
-	- `Tween:Play`: `tween.Play(0, 1)`
+	- `Tween:Play()`: `tween.Play(0, 1)`
 
 	@param instance Instance to tween
 	@param methodProps { [string]: any (goal) }
@@ -316,11 +327,11 @@ end
 
 --[[
 	Equivalent to `MethodTween.new`:
-	- `.new`: `
+	- `.new(instance, tweenInfo, methodProps)`: `
 	local tweenFunc = FunctionTween.InstanceMethods(instance, methodProps)
 	local tween = FunctionTween.new(tweenFunc, tweenInfo)
 	`
-	- `:Play`: `tween.Play(0, 1)`
+	- `:Play()`: `tween.Play(0, 1)`
 
 	@param instance Instance to tween
 	@param methodProps { [string]: { any (initialValue), any (finalValue) } }

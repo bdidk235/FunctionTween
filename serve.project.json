@@ -4,27 +4,44 @@
 		"$className": "DataModel",
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"$path": "Packages",
-			"FunctionTween": {
-				"$path": "default.project.json"
+			"Packages": {
+				"$path": "Packages",
+				"FunctionTween": {
+					"$path": "default.project.json"
+				},
+				"PhysicsTween": {
+					"$path": "extra/PhysicsTween/default.project.json"
+				}
 			},
-			"PhysicsTween": {
-				"$path": "extra/PhysicsTween/default.project.json"
-			}
-		},
-		"Workspace": {
-			"$className": "ReplicatedStorage",
 			"Models": {
 				"$className": "Folder",
 				"FunctionTween": {
-					"$path": "models/FunctionTweenPackage.luau",
+					"$path": "build/FunctionTweenPackage.luau",
 					"Package": {
 						"$path": "Packages",
 						"FunctionTween": {
 							"$path": "default.project.json"
 						}
 					}
+				},
+				"PhysicsTween": {
+					"$path": "build/PhysicsTweenPackage.luau",
+					"Package": {
+						"$path": "Packages",
+						"FunctionTween": {
+							"$path": "default.project.json"
+						},
+						"PhysicsTween": {
+							"$path": "extra/PhysicsTween/default.project.json"
+						}
+					}
 				}
+			}
+		},
+		"Workspace": {
+			"$ignoreUnknownInstances": true,
+			"Tests": {
+				"$path": "tests/Tests.rbxmx"
 			}
 		}
 	}

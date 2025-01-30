@@ -1,6 +1,8 @@
 --[[
 	FunctionTween-like way to do Physics-Based Tweens with FunctionTween
 	See: https://devforum.roblox.com/t/howto-physics-based-tweenservice/2873727
+
+	Repository: https://github.com/bdidk235/FunctionTween/tree/main/extra/PhysicsTween
 ]]
 local RunService = game:GetService("RunService")
 
@@ -9,6 +11,7 @@ type Signal<T...> = Signal.Signal<T...>
 
 local FunctionTween = require(script.Parent.FunctionTween)
 type ExtendedTweenInfo = FunctionTween.ExtendedTweenInfo
+type TweenSignal = FunctionTween.TweenSignal
 
 export type PhysicsTween = {
 	Play: (newGoalCFrame: CFrame, tweenInfo: ExtendedTweenInfo?) -> (),
@@ -33,14 +36,14 @@ local function changeVelocties(object: Instance, velocity: Vector3, angularVeloc
 	end
 end
 
-local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?)
+local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, tweenSignal: (TweenSignal | "None")?)
 	local startingCFrame = model:GetPivot()
 	local goalCFrame = CFrame.new()
 
-	local lastTweenTime = os.clock()
+	local lastFrameTime = os.clock()
 	local tween = FunctionTween.new(function(alpha, deltaTime)
-		local currentTweenTime = os.clock()
-		lastTweenTime = currentTweenTime
+		local currentFrameTime = os.clock()
+		lastFrameTime = currentFrameTime
 
 		local deltaSpeed = 1 / deltaTime
 
@@ -52,19 +55,19 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?)
 
 		if alpha == 1 then
 			task.delay(deltaTime, function()
-				if lastTweenTime ~= currentTweenTime then return end
+				if lastFrameTime ~= currentFrameTime then return end
 				changeVelocties(model, Vector3.zero, Vector3.zero)
 			end)
 		end
 
 		model:PivotTo(newCFrame)
-	end, initialTweenInfo, RunService.PreSimulation)
+	end, initialTweenInfo, if tweenSignal ~= "None" then (tweenSignal or RunService.PreSimulation) else nil)
 
 	local function play(newGoalCFrame: CFrame, tweenInfo: ExtendedTweenInfo?)
 		startingCFrame = model:GetPivot()
 		goalCFrame = newGoalCFrame
 
-		lastTweenTime = os.clock()
+		lastFrameTime = os.clock()
 		tween.Play(0, 1, tweenInfo)
 	end
 

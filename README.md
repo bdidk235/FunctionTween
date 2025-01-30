@@ -32,7 +32,7 @@ local RunService = game:GetService("RunService")
 local FunctionTween = require(path.to.FunctionTween)
 
 local easingFunction = function(x: number)
-	return (x ^ 2) / 2
+	return x ^ 2
 end
 
 local tween = FunctionTween.new(
@@ -109,7 +109,7 @@ tween.Completed:Wait()
 print("Tween completed!")
 ```
 
-### Equivalents
+## Equivalents
 
 #### FunctionTween.InstanceProps
 

@@ -1,4 +1,5 @@
 **/*.rbxm
 **/*.rbxmx
+!tests/**
 **/sourcemap.json
 **/Packages
