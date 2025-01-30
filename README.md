@@ -50,9 +50,9 @@ local tween = FunctionTween.new(
 )
 ```
 
-### New FunctionTween
+## New FunctionTween
 
-Functions
+### Functions
 
 #### tween.Play
 
@@ -93,7 +93,7 @@ Cancels the tween, it cannot be resumed.
 tween.Cancel()
 ```
 
-Properties
+### Properties
 
 #### tween.PlaybackState
 
