@@ -111,6 +111,16 @@ tween.Completed:Wait()
 print("Tween completed!")
 ```
 
+## Other Functions
+
+## FunctionTween.LerpValue
+
+Returns a value between `valueA` and `valueB` based on `alpha`, used internally for Equivalents.
+
+```luau
+print(FunctionTween.LerpValue(0, 100, 0.5)) -- Prints 50
+```
+
 ## Equivalents
 
 #### FunctionTween.InstanceProps

@@ -280,7 +280,7 @@ local builtInLerps = {
 }
 
 --[[
-	Returns a value between valueA and valueB based on alpha, used internally for Equivalents.
+	Returns a value between `valueA` and `valueB` based on `alpha`, used internally for Equivalents.
 
 	@param valueA T -- Start Value (returns when alpha is 0)
 	@param valueB T -- End Value (returns when alpha is 1)
