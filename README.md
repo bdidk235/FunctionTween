@@ -113,7 +113,7 @@ print("Tween completed!")
 
 ## Other Functions
 
-## FunctionTween.LerpValue
+### FunctionTween.LerpValue
 
 Returns a value between `valueA` and `valueB` based on `alpha`, used internally for Equivalents.
 
@@ -123,7 +123,7 @@ print(FunctionTween.LerpValue(0, 100, 0.5)) -- Prints 50
 
 ## Equivalents
 
-#### FunctionTween.InstanceProps
+### FunctionTween.InstanceProps
 
 Equivalent to `TweenService:Create`
 
@@ -137,7 +137,7 @@ local tweenFunc = FunctionTween.InstanceProps(
 local tween = FunctionTween.new(tweenFunc)
 ```
 
-#### FunctionTween.InstanceMethods
+### FunctionTween.InstanceMethods
 
 Equivalent to `MethodTween.new`
 

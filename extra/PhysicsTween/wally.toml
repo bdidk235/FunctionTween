@@ -1,12 +1,12 @@
 [package]
 name = "bdidk235/physicstween"
 description = "FunctionTween-like way to do Physics-Based Tweens with FunctionTween"
-version = "0.1.0"
+version = "0.1.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 exclude = ["**"]
 include = ["src", "src/**", "default.project.json", "wally.toml"]
 
 [dependencies]
-FunctionTween = "bdidk235/functiontween@^0.1.0"
+FunctionTween = "bdidk235/functiontween@^0.1.1"
 Signal = "sleitnick/signal@^2.0.0" # for Signal type
