@@ -1,3 +1,4 @@
+-- v0.1.1
 local FunctionTween = require(script.Package.FunctionTween)
 -- Type Exports
 export type FunctionTween = FunctionTween.FunctionTween

@@ -43,6 +43,11 @@ export type FunctionTween = {
 
 --[[
 	Creates a new FunctionTween table.
+
+	@param func -- Function to use for tweening.
+	@param initialTweenInfo -- TweenInfo to use for playing, if not provided in `.play`.
+	@param tweenSignal -- What to update the function on
+	@return -- New FunctionTween table
 ]]
 local function new(
 	func: (value: number, deltaTime: number) -> (),
@@ -60,6 +65,10 @@ local function new(
 
 	--[[
 		Plays the tween.
+
+		@param startValue -- Start Number
+		@param endValue -- End Number
+		@param tweenInfo -- TweenInfo to use, overrides provided in `.new`
 	]]
 	local function play(startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
 		self.PlaybackState = Enum.PlaybackState.Begin
@@ -213,7 +222,7 @@ local function new(
 	end
 
 	--[[
-		Pauses the tween
+		Pauses the tween.
 	]]
 	local function pause()
 		if self.PlaybackState == Enum.PlaybackState.Begin then return end
@@ -270,24 +279,38 @@ local builtInLerps = {
 	["Color3"] = true,
 }
 
-local function lerpValue(valueA: any, valueB: any, alpha: number)
-	local Type = typeof(valueA)
+--[[
+	Returns a value between valueA and valueB based on alpha, used internally for Equivalents.
 
-	if Type == "boolean" or Type == "EnumItem" then
-		return valueB
-	elseif Type == "number" then
-		return lerp(valueA, valueB, alpha)
-	elseif builtInLerps[Type] then
-		return valueA:Lerp(valueB, alpha)
-	elseif Type == "Rect" then
-		return Rect.new(valueA.Min:Lerp(valueB.Min, alpha), valueA.Max:Lerp(valueB.Max, alpha))
-	elseif Type == "UDim" then
-		return UDim.new(lerp(valueA.Scale, valueB.Scale, alpha), lerp(valueA.Offset, valueB.Offset, alpha))
-	elseif Type == "Vector2int16" then
-		return Vector2int16.new(lerp(valueA.X, valueB.X, alpha), lerp(valueA.Y, valueB.Y, alpha))
+	@param valueA T -- Start Value (returns when alpha is 0)
+	@param valueB T -- End Value (returns when alpha is 1)
+	@param alpha number -- Alpha to return value from valueA and valueB
+	@return T -- A value between valueA and valueB based on alpha
+
+	@since v0.1.1
+]]
+local function LerpValue<T>(valueA: T, valueB: T, alpha: number): T
+	-- Entirely Avoiding Luau type checker because I don't want to deal with it.
+	local anyA = valueA :: any
+	local anyB = valueB :: any
+
+	local valueType = typeof(valueA)
+
+	if valueType == "boolean" or valueType == "EnumItem" then
+		return anyB
+	elseif valueType == "number" then
+		return lerp(anyA, anyB, alpha) :: any
+	elseif builtInLerps[valueType] then
+		return anyA:Lerp(anyB, alpha) :: any
+	elseif valueType == "Rect" then
+		return Rect.new(anyA.Min:Lerp(anyB.Min, alpha), anyA.Max:Lerp(anyB.Max, alpha)) :: any
+	elseif valueType == "UDim" then
+		return UDim.new(lerp(anyA.Scale, anyB.Scale, alpha), lerp(anyA.Offset, anyB.Offset, alpha)) :: any
+	elseif valueType == "Vector2int16" then
+		return Vector2int16.new(lerp(anyA.X, anyB.X, alpha), lerp(anyA.Y, anyB.Y, alpha)) :: any
 	end
 
-	error(`lerpValue: Unsupported type {Type}`)
+	error(`LerpValue: Unsupported type '{valueType}'`)
 end
 
 --[[
@@ -298,17 +321,19 @@ end
 	`
 	- `Tween:Play()`: `tween.Play(0, 1)`
 
-	@param instance Instance to tween
-	@param methodProps { [string]: any (goal) }
-	@return function Function to use for tweening
+	@param instance -- Instance to tween
+	@param props -- { [string]: any (goal) }
+	@return (alpha: number) -> () -- Function with alpha argument
 ]]
 local function InstanceProps(instance: Instance, props: { [string]: any })
 	local instanceAny = instance :: any
 
 	local initialValues = {}
 	for name, finalValue in props do
-		assert(typeof(instanceAny[name]) == typeof(finalValue), "Initial and final values must be of the same type")
 		local success, err = pcall(function()
+			assert(typeof(instanceAny[name]) == typeof(finalValue), "Initial and final values must be of the same type")
+			-- Check if you can tween before adding initial value
+			local _ = LerpValue(instanceAny[name], instanceAny[name], 0)
 			initialValues[name] = instanceAny[name]
 		end)
 		if not success then error(`Failed to get property '{name}' for '{instance:GetFullName()}': {err}`) end
@@ -318,7 +343,7 @@ local function InstanceProps(instance: Instance, props: { [string]: any })
 		for name, value in props do
 			local initialValue = initialValues[name]
 			local success, err = pcall(function()
-				local newValue = lerpValue(initialValue, value, alpha)
+				local newValue = LerpValue(initialValue, value, alpha)
 				instanceAny[name] = newValue
 			end)
 			if not success and not initialValue then
@@ -336,16 +361,20 @@ end
 	`
 	- `:Play()`: `tween.Play(0, 1)`
 
-	@param instance Instance to tween
-	@param methodProps { [string]: { any (initialValue), any (finalValue) } }
-	@return function Function to use for tweening
+	@param instance -- Instance to tween
+	@param methodProps -- { [string]: { any (initialValue), any (finalValue) } }
+	@return (alpha: number) -> () -- Function with alpha argument
 ]]
 local function InstanceMethods(instance: Instance, methodProps: { [string]: { any } })
 	local instanceAny = instance :: any
 
-	for _, propData in methodProps do
+	for name, propData in methodProps do
 		local initialValue, finalValue = propData[1], propData[2]
-		assert(typeof(initialValue) == typeof(finalValue), "Initial and final values must be of the same type")
+		local success, err = pcall(function()
+			assert(typeof(initialValue) == typeof(finalValue), "Initial and final values must be of the same type")
+			local _ = LerpValue(initialValue, finalValue, 0)
+		end)
+		if not success then error(`Failed to get property '{name}' for '{instance:GetFullName()}': {err}`) end
 	end
 
 	local initialValues = {}
@@ -357,7 +386,7 @@ local function InstanceMethods(instance: Instance, methodProps: { [string]: { an
 		for name, propData in methodProps do
 			local initialValue = initialValues[name]
 			local success, err = pcall(function()
-				local newValue = lerpValue(initialValue, propData[2], alpha)
+				local newValue = LerpValue(initialValue, propData[2], alpha)
 				instanceAny[name](instance, newValue)
 			end)
 			if not success then error(`Failed to set property '{name}' for '{instance:GetFullName()}': {err}`) end
@@ -368,6 +397,7 @@ end
 return {
 	new = new,
 
+	LerpValue = LerpValue,
 	-- Equivalents
 	InstanceProps = InstanceProps,
 	InstanceMethods = InstanceMethods,

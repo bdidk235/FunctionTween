@@ -1,5 +1,5 @@
 --[[
-	FunctionTween-like way to do Physics-Based Tweens with FunctionTween
+	PhysicsTween - FunctionTween-like way to do Physics-Based Tweens with FunctionTween
 	See: https://devforum.roblox.com/t/howto-physics-based-tweenservice/2873727
 
 	Repository: https://github.com/bdidk235/FunctionTween/tree/main/extra/PhysicsTween
@@ -36,6 +36,14 @@ local function changeVelocties(object: Instance, velocity: Vector3, angularVeloc
 	end
 end
 
+--[[
+	Creates a new PhysicsTween table.
+
+	@param model -- Model to use for tweening.
+	@param initialTweenInfo -- TweenInfo to use for playing, if not provided in `.play`.
+	@param tweenSignal -- What to update the function on
+	@return -- New PhysicsTween table
+]]
 local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, tweenSignal: (TweenSignal | "None")?)
 	local startingCFrame = model:GetPivot()
 	local goalCFrame = CFrame.new()
@@ -63,19 +71,41 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 		model:PivotTo(newCFrame)
 	end, initialTweenInfo, if tweenSignal ~= "None" then (tweenSignal or RunService.PreSimulation) else nil)
 
-	local function play(newGoalCFrame: CFrame, tweenInfo: ExtendedTweenInfo?)
+	--[[
+		Plays the tween.
+
+		@param newGoalPivot -- What Pivot the model goes to
+		@param tweenInfo -- TweenInfo to use, overrides provided in `.new`
+	]]
+	local function play(newGoalPivot: CFrame, tweenInfo: ExtendedTweenInfo?)
 		startingCFrame = model:GetPivot()
-		goalCFrame = newGoalCFrame
+		goalCFrame = newGoalPivot
 
 		lastFrameTime = os.clock()
 		tween.Play(0, 1, tweenInfo)
 	end
 
+	--[[
+		Pauses the tween.
+	]]
+	local function pause()
+		tween.Pause()
+		changeVelocties(model, Vector3.zero, Vector3.zero)
+	end
+
+	--[[
+		Cancels the tween, it cannot be resumed.
+	]]
+	local function cancel()
+		tween.Cancel()
+		changeVelocties(model, Vector3.zero, Vector3.zero)
+	end
+
 	return {
 		Play = play,
-		Pause = tween.Pause,
+		Pause = pause,
 		Resume = tween.Resume,
-		Cancel = tween.Cancel,
+		Cancel = cancel,
 
 		PlaybackState = tween.PlaybackState,
 		Completed = tween.Completed,

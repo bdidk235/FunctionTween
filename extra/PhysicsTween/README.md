@@ -2,7 +2,7 @@
 
 FunctionTween-like way to do [Physics-Based Tweens](https://devforum.roblox.com/t/howto-physics-based-tweenservice/2873727) with FunctionTween
 
-[Roblox Model](https://create.roblox.com/store/asset/106920082876794/PhysicsTween) | [Wally](https://wally.run/package/bdidk235/physicstween) | [Github Release](https://github.com/bdidk235/FunctionTween/releases/latest)
+[Roblox Model](https://create.roblox.com/store/asset/106920082876794/PhysicsTween) | [Wally](https://wally.run/package/bdidk235/physicstween) | [GitHub Release](https://github.com/bdidk235/FunctionTween/releases/latest)
 
 # Usage
 
