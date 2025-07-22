@@ -4,6 +4,12 @@ Tween whatever you want, however you want.
 
 [Roblox Model](https://create.roblox.com/store/asset/119180526446463/FunctionTween) | [Wally](https://wally.run/package/bdidk235/functiontween) | [GitHub Release](https://github.com/bdidk235/FunctionTween/releases/latest)
 
+## What else?
+
+Tweens interpolate a number from start to end over a defined time, and there are better solutions for other problems.
+
+For example, <b>Spring</b> is great for physics-based movement.
+
 ## Usage
 
 A simple example for moving a part, using `PivotTo`.

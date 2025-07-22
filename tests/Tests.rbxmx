@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Folder" referent="RBX27C499A8866B4599800BC58C8F381C25">
+	<Item class="Folder" referent="RBX3F6EFAECB54D481A928F428673418A55">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -11,7 +11,7 @@
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Part" referent="RBXCF79D6362C7B40B2A8716EED76D9D52A">
+		<Item class="Part" referent="RBX2C576A5652D0411BB0E08036530180DD">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -109,7 +109,7 @@
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBX555606EAF8F6468CAE276D7ABC881548">
+			<Item class="Script" referent="RBX241E9A8ED09B40A58481435701C88E38">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -118,7 +118,7 @@
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{6F474290-F3BB-48F7-B093-37FBA36BA95D}</string>
+					<string name="ScriptGuid">{78A47807-3048-4E41-93F9-096A7791C698}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -138,10 +138,10 @@ tween.Play(GoalPivot)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBXA5C007BD7F8F4A0490182C99545C2358">
+			<Item class="SurfaceGui" referent="RBX926E0CF3320E4C06829A2D0C30C87E39">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBXCF79D6362C7B40B2A8716EED76D9D52A</Ref>
+					<Ref name="Adornee">RBX2C576A5652D0411BB0E08036530180DD</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -173,7 +173,7 @@ tween.Play(GoalPivot)
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBX4F4438D1BE054C2090E10AD421D2FBF4">
+				<Item class="TextLabel" referent="RBX15A5ACB29DB849ABA284AE6E3BE3278E">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -268,7 +268,7 @@ tween.Play(GoalPivot)
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBX7B4AD27BC55E47FA908D270BE717C7BA">
+			<Item class="Part" referent="RBX5E7482FE16654B20BEBB383247A97231">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -368,7 +368,7 @@ tween.Play(GoalPivot)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX1335956532B1422A9F69985B5EE4EDB6">
+		<Item class="Part" referent="RBX5E21F471F511454E8109DF67BA41A8A4">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -466,7 +466,7 @@ tween.Play(GoalPivot)
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBX1940BFB8398C47B195EF7EF5FF28EA86">
+			<Item class="Script" referent="RBX609DE1455BA5493E827BC14EC8568BF7">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -475,7 +475,7 @@ tween.Play(GoalPivot)
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{02AF1AC5-F8A6-4E0F-9B37-1D429E12B07E}</string>
+					<string name="ScriptGuid">{62AA6565-70B7-496D-B81D-CB0355487374}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -502,10 +502,10 @@ tween.Play(0, 1)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBX42BF4612043C423E9E92E9DA8B4FF370">
+			<Item class="SurfaceGui" referent="RBX7338AF7CD9994DFD970A17593A411A4F">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBX1335956532B1422A9F69985B5EE4EDB6</Ref>
+					<Ref name="Adornee">RBX5E21F471F511454E8109DF67BA41A8A4</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -537,7 +537,7 @@ tween.Play(0, 1)
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBX486AEE9E2DDA4B0F8BE72C27F71338FD">
+				<Item class="TextLabel" referent="RBX62FA15097F4A4140B16362CB6E9AC4C1">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -632,7 +632,7 @@ tween.Play(0, 1)
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBXEE168DE45E0B45598A2DDA4409BA2F32">
+			<Item class="Part" referent="RBX891CE83C6CA34DD8899AC892775E9BE1">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -732,7 +732,7 @@ tween.Play(0, 1)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBXBD022CBD8A2842CAA7966D9E64181E06">
+		<Item class="Part" referent="RBX220D3E29C4DD476F9DA4CCDEDD109961">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -830,7 +830,7 @@ tween.Play(0, 1)
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBX2224B4E6E2FE40E888DAEA34B4199A4E">
+			<Item class="Script" referent="RBX47D5B106DA2E4F49BBD17A1BA60E4628">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -839,7 +839,7 @@ tween.Play(0, 1)
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{37F71C14-47CF-43FF-A99C-B42FD37441EE}</string>
+					<string name="ScriptGuid">{7FA2AF38-69FD-4373-A226-AF55FD0F08AD}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -877,10 +877,10 @@ tween.Play(0, 1)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBXF4D150EA9A9C40A1BD197963E8B45B7B">
+			<Item class="SurfaceGui" referent="RBXF665012F2DDF44FF90CCBEF2F29E9F24">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBXBD022CBD8A2842CAA7966D9E64181E06</Ref>
+					<Ref name="Adornee">RBX220D3E29C4DD476F9DA4CCDEDD109961</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -912,7 +912,7 @@ tween.Play(0, 1)
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBX281A0C8BCB464A12946288B802551315">
+				<Item class="TextLabel" referent="RBXE69518A844C44DBDA1025D5ED8D7B83E">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -1007,7 +1007,7 @@ tween.Play(0, 1)
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBX711A12D3C05B42CB963F1526D6E6F864">
+			<Item class="Part" referent="RBX73376CA4F4D041B1977CB48ABF0A7C85">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1107,7 +1107,7 @@ tween.Play(0, 1)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX7C179AAA552C4A96828320BCE2D2A093">
+		<Item class="Part" referent="RBX9FE9FB4000F44F07835180410B88AF4D">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1205,7 +1205,7 @@ tween.Play(0, 1)
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBXA2F842351B4C4973B68A7EF7C04EA665">
+			<Item class="Script" referent="RBXE500F9D292D04447B2556895D2C894DE">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1214,13 +1214,15 @@ tween.Play(0, 1)
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{0D7A15D8-11DA-4C06-9A6F-D5655A055E03}</string>
+					<string name="ScriptGuid">{6E9E2318-488F-4805-81B1-8C8847777A18}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FunctionTween = require(ReplicatedStorage.Packages.FunctionTween)
 
 local PartToMove = script.Parent
+local TextLabel = PartToMove.SurfaceGui.TextLabel
+local OriginalText = TextLabel.Text
 local GoalPart = PartToMove.Goal
 GoalPart.Transparency = 1
 
@@ -1237,35 +1239,50 @@ local tween = FunctionTween.new(
 )
 while true do
 	tween.Play(0, 1)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(1)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.5)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	tween.Cancel()
+	TextLabel.Text = `{OriginalText}<br/>Function: Cancel`
 	task.wait(0.25)
 	tween.Play(0, 1)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	task.wait(0.25)
 	tween.Play(lastT, 0)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	tween.Cancel()
+	TextLabel.Text = `{OriginalText}<br/>Function: Cancel`
 	task.wait(2)
 end
 ]]></ProtectedString>
@@ -1273,10 +1290,10 @@ end
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBXE7146727C8704312BAE29020D6930EE3">
+			<Item class="SurfaceGui" referent="RBXA17A419A369347178FB85D6370F009CB">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBX7C179AAA552C4A96828320BCE2D2A093</Ref>
+					<Ref name="Adornee">RBX9FE9FB4000F44F07835180410B88AF4D</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -1308,7 +1325,7 @@ end
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBX29F3D5D49979492AB9BCD173D2FFDD6F">
+				<Item class="TextLabel" referent="RBXCB45BCE05ABF401A84374ADCDC69F6E3">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -1403,7 +1420,7 @@ end
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBXE2CEEBFB48A4467C8028578551785065">
+			<Item class="Part" referent="RBX5A9EB4A2065D43D4BCADCCA5948A828A">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1503,7 +1520,7 @@ end
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBXCC0BF0CA36E54997B0D5A3F8A8A2294A">
+		<Item class="Part" referent="RBX143F7A1D83594B2B82136AAFB0D57092">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1601,7 +1618,7 @@ end
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBX1472FEE1E5634A9B8E32B0C3AF3CE0E5">
+			<Item class="Script" referent="RBX9BA50CBC50A04D6BAFB3CAE50E60B5DC">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1610,7 +1627,7 @@ end
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{92A89276-B244-4B58-9564-2B4279EBD573}</string>
+					<string name="ScriptGuid">{30039A16-14C5-415C-9B7C-70CAF8AE1D3B}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -1618,6 +1635,8 @@ local RunService = game:GetService("RunService")
 local FunctionTween = require(ReplicatedStorage.Packages.FunctionTween)
 
 local PartToMove = script.Parent
+local TextLabel = PartToMove.SurfaceGui.TextLabel
+local OriginalText = TextLabel.Text
 local GoalPart = PartToMove.Goal
 GoalPart.Transparency = 1
 
@@ -1635,35 +1654,50 @@ local tween = FunctionTween.new(
 )
 while true do
 	tween.Play(0, 1)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(1)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.5)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	tween.Cancel()
+	TextLabel.Text = `{OriginalText}<br/>Function: Cancel`
 	task.wait(0.25)
 	tween.Play(0, 1)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	task.wait(0.25)
 	tween.Play(lastT, 0)
+	TextLabel.Text = `{OriginalText}<br/>Function: Play`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.3)
 	tween.Pause()
+	TextLabel.Text = `{OriginalText}<br/>Function: Pause`
 	task.wait(0.1)
 	tween.Resume()
+	TextLabel.Text = `{OriginalText}<br/>Function: Resume`
 	task.wait(0.5)
 	tween.Cancel()
+	TextLabel.Text = `{OriginalText}<br/>Function: Cancel`
 	task.wait(2)
 end
 ]]></ProtectedString>
@@ -1671,10 +1705,10 @@ end
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBX072A456F0041419D973D1F0935D79758">
+			<Item class="SurfaceGui" referent="RBX144D1563F4954E3789B8EACD0150308D">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBXCC0BF0CA36E54997B0D5A3F8A8A2294A</Ref>
+					<Ref name="Adornee">RBX143F7A1D83594B2B82136AAFB0D57092</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -1706,7 +1740,7 @@ end
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBXB1EEE730E7B14784AA3FD179991A2BD0">
+				<Item class="TextLabel" referent="RBXA77E5A69AC4440BD8BBCAC4141996C28">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -1801,7 +1835,7 @@ end
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBX0815A8977E424430AD986C084878D653">
+			<Item class="Part" referent="RBX9031BB43B62F4D88974DC563B4AD33BC">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1901,7 +1935,7 @@ end
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBXABA28061A7CD45398B989876BE702721">
+		<Item class="Part" referent="RBX67B6E5C43354472CB39F4E1F1D2DAA86">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1999,7 +2033,7 @@ end
 					<Z>7.5</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Script" referent="RBX560B048B85D24DEA832737B4CEF307CF">
+			<Item class="Script" referent="RBX7034541A1D4E403F83C5B04FE115B7CB">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -2008,7 +2042,7 @@ end
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Script</string>
 					<token name="RunContext">2</token>
-					<string name="ScriptGuid">{387B98B5-72D4-4D71-AC50-2BAEA0F5E92D}</string>
+					<string name="ScriptGuid">{1D3F5FCA-F616-4C75-8C13-E3158A45690C}</string>
 					<ProtectedString name="Source"><![CDATA[--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -2034,10 +2068,10 @@ tween.Play(0, 1)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="SurfaceGui" referent="RBXAE584AA6E2EC49BFBAB08475ECC6BE47">
+			<Item class="SurfaceGui" referent="RBX8250F49DB7EC4662BE1FDCB7495EA908">
 				<Properties>
 					<bool name="Active">true</bool>
-					<Ref name="Adornee">RBXABA28061A7CD45398B989876BE702721</Ref>
+					<Ref name="Adornee">RBX67B6E5C43354472CB39F4E1F1D2DAA86</Ref>
 					<bool name="AlwaysOnTop">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -2069,7 +2103,7 @@ tween.Play(0, 1)
 					<token name="ZIndexBehavior">1</token>
 					<float name="ZOffset">0</float>
 				</Properties>
-				<Item class="TextLabel" referent="RBXE9DE76F4254F4A6CA853B1C286DCD1B1">
+				<Item class="TextLabel" referent="RBXFAC7CDA7AE7C44C0A9C89F828822326D">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -2164,7 +2198,7 @@ tween.Play(0, 1)
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBX3227D23D053C4F0394DFB7AF3589BF28">
+			<Item class="Part" referent="RBX36954D74133343B09C03BD2C3C2FE832">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>

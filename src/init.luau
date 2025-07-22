@@ -396,7 +396,7 @@ local function InstanceProps(instance: Instance, props: { [string]: any })
 	for name, finalValue in props do
 		local success, err = pcall(function()
 			assert(typeof(instanceAny[name]) == typeof(finalValue), "Initial and final values must be of the same type")
-			-- Check if you can tween before adding initial value
+			-- Check if prop can lerp before adding initial value
 			local _ = LerpValue(instanceAny[name], instanceAny[name], 0)
 			initialValues[name] = instanceAny[name]
 		end)
@@ -436,6 +436,7 @@ local function InstanceMethods(instance: Instance, methodProps: { [string]: { an
 		local initialValue, finalValue = propData[1], propData[2]
 		local success, err = pcall(function()
 			assert(typeof(initialValue) == typeof(finalValue), "Initial and final values must be of the same type")
+			-- Check if prop can lerp
 			local _ = LerpValue(initialValue, finalValue, 0)
 		end)
 		if not success then error(`Failed to get property '{name}' for '{instance:GetFullName()}': {err}`) end
