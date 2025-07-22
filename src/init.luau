@@ -9,6 +9,8 @@ local TweenService = game:GetService("TweenService")
 local Signal = require(script.Parent.Signal)
 type Signal<T...> = Signal.Signal<T...>
 
+local SINGAL_REPEAT_RESETS_TIME = false -- More accurate to how TweenService works
+
 function lerp(a: number, b: number, t: number)
 	return a * (1 - t) + b * t
 end
@@ -25,21 +27,241 @@ export type TweenSignal =
 	| { Connect: (self: any, callback: (number) -> ()) -> any }
 	| { RenderStepName: string, RenderPriority: number }
 
-export type ExtendedTweenInfo = TweenInfo | {
+type TweenInfoTable = {
+	Time: number?,
+	EasingStyle: Enum.EasingStyle?,
+	EasingDirection: Enum.EasingDirection?,
+	RepeatCount: number?,
+	Reverses: boolean?,
+	DelayTime: number?,
+}
+
+export type ExtendedTweenInfo = TweenInfo | (({
 	TweenInfo: TweenInfo,
+} | TweenInfoTable) & {
 	-- Overrides TweenInfo's EasingStyle and EasingDirection
 	EasingFunction: ((number) -> number)?,
+})
+
+type FTObject = {
+	self: FunctionTween,
+	func: (value: number, deltaTime: number) -> (),
+	initialTweenInfo: ExtendedTweenInfo?,
+	tweenSignal: TweenSignal?,
+
+	currentTween: Tween?,
+	cancelFunc: (() -> ())?,
+	delayedThread: thread?,
 }
 
 export type FunctionTween = {
 	Play: (startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?) -> (),
-	Pause: () -> (),
-	Resume: () -> (),
-	Cancel: () -> (),
+	Pause: (s: never?) -> (),
+	Resume: (s: never?) -> (),
+	Cancel: (s: never?) -> (),
 
 	PlaybackState: Enum.PlaybackState,
 	Completed: Signal<Enum.PlaybackState>,
 }
+
+local function play(object: FTObject, startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
+	assert(typeof(startValue) == "number", "startValue is not a number")
+	assert(typeof(endValue) == "number", "startValue is not a number")
+	local o = object
+	local self = o.self
+
+	self.PlaybackState = Enum.PlaybackState.Begin
+
+	if o.cancelFunc then
+		o.cancelFunc()
+		o.cancelFunc = nil
+	end
+
+	tweenInfo = tweenInfo or o.initialTweenInfo
+	local actualTweenInfo = if typeof(tweenInfo) == "table" and typeof(tweenInfo.TweenInfo) == "TweenInfo"
+		then tweenInfo.TweenInfo
+		else tweenInfo
+	assert(
+		typeof(actualTweenInfo) == "TweenInfo" or typeof(actualTweenInfo) == "table",
+		"TweenInfo is missing, add TweenInfo to '.Play' or '.new'."
+	)
+
+	local easingFunction = function(alpha: number)
+		return TweenService:GetValue(alpha, actualTweenInfo.EasingStyle, actualTweenInfo.EasingDirection)
+	end
+	if typeof(tweenInfo) == "table" and typeof(tweenInfo.EasingFunction) == "function" then
+		easingFunction = tweenInfo.EasingFunction
+	end
+
+	if o.tweenSignal then
+		self.PlaybackState = actualTweenInfo.DelayTime > 0 and Enum.PlaybackState.Delayed or Enum.PlaybackState.Playing
+
+		local cancelDelayedThread = function()
+			if o.delayedThread then
+				if coroutine.status(o.delayedThread) == "suspended" then task.cancel(o.delayedThread) end
+				o.delayedThread = nil
+			end
+		end
+
+		o.cancelFunc = cancelDelayedThread
+
+		-- Thanks to MethodTween for figuring this out
+		o.delayedThread = delayCallback(actualTweenInfo.DelayTime, function()
+			self.PlaybackState = Enum.PlaybackState.Playing
+
+			local repeatCount = (actualTweenInfo.RepeatCount + 1) * (if actualTweenInfo.Reverses then 2 else 1)
+			local timesRepeated = 0
+
+			local _time = 0
+			local lastFrameTime = 0
+			local function tweenCallback()
+				if self.PlaybackState == Enum.PlaybackState.Cancelled then return end
+				if self.PlaybackState == Enum.PlaybackState.Completed then return end
+
+				local currentFrameTime = os.clock()
+				local deltaTime = currentFrameTime - lastFrameTime
+				lastFrameTime = currentFrameTime
+
+				if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
+
+				_time += deltaTime
+
+				local repeatTimesRepated = if not SINGAL_REPEAT_RESETS_TIME then timesRepeated else 0
+				local alpha = math.min(_time / actualTweenInfo.Time - repeatTimesRepated, 1)
+				local tweenAlpha = easingFunction(alpha)
+				if actualTweenInfo.Reverses and timesRepeated % 2 == 1 then tweenAlpha = 1 - tweenAlpha end
+
+				o.func(lerp(startValue, endValue, tweenAlpha), deltaTime)
+
+				if alpha >= 1 then
+					timesRepeated += 1
+					if SINGAL_REPEAT_RESETS_TIME then _time = 0 end
+				end
+
+				if timesRepeated >= repeatCount and actualTweenInfo.RepeatCount >= 0 then
+					self.PlaybackState = Enum.PlaybackState.Completed
+					if o.cancelFunc then
+						o.cancelFunc()
+						o.cancelFunc = nil
+					end
+				end
+			end
+
+			lastFrameTime = os.clock()
+			if typeof(o.tweenSignal) == "table" and (o.tweenSignal :: any).RenderStepName then
+				RunService:BindToRenderStep(
+					(o.tweenSignal :: any).RenderStepName,
+					(o.tweenSignal :: any).RenderPriority,
+					tweenCallback
+				)
+				o.cancelFunc = function()
+					RunService:UnbindFromRenderStep((o.tweenSignal :: any).RenderStepName)
+					cancelDelayedThread()
+				end
+			else
+				local connection = (o.tweenSignal :: any):Connect(tweenCallback)
+				o.cancelFunc = function()
+					connection:Disconnect()
+					o.cancelFunc = nil
+
+					self.Completed:Fire(self.PlaybackState)
+					cancelDelayedThread()
+				end
+			end
+		end)
+	else
+		local temporaryValue = Instance.new("NumberValue")
+		temporaryValue.Value = 0
+
+		local lastAlpha = 0
+		local valueChanged = temporaryValue:GetPropertyChangedSignal("Value"):Connect(function()
+			local alpha = temporaryValue.Value
+			local deltaTime = (alpha - lastAlpha) * actualTweenInfo.Time
+			lastAlpha = alpha
+
+			local tweenAlpha = easingFunction(alpha)
+			o.func(lerp(startValue, endValue, tweenAlpha), deltaTime)
+		end)
+
+		local linearTweenInfo = TweenInfo.new(
+			actualTweenInfo.Time or 1,
+			-- Doing linear tween for custom Easing Function and deltaTime
+			Enum.EasingStyle.Linear,
+			Enum.EasingDirection.Out,
+			actualTweenInfo.RepeatCount or 0,
+			actualTweenInfo.Reverses or false,
+			actualTweenInfo.DelayTime or 0
+		)
+		local tween = TweenService:Create(temporaryValue, linearTweenInfo, {
+			Value = 1,
+		})
+		o.currentTween = tween
+		tween:Play()
+
+		self.PlaybackState = tween.PlaybackState
+		local playbackStateChanged = tween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
+			self.PlaybackState = tween.PlaybackState
+		end)
+
+		local tweenCompleted
+		tweenCompleted = tween.Completed:Connect(function(playbackState)
+			o.currentTween = nil
+			o.cancelFunc = nil
+
+			tweenCompleted:Disconnect()
+			playbackStateChanged:Disconnect()
+			tween:Destroy()
+			valueChanged:Disconnect()
+			temporaryValue:Destroy()
+
+			self.Completed:Fire(playbackState)
+		end)
+		o.cancelFunc = function()
+			tween:Cancel() -- Fires tween.Completed
+		end
+	end
+end
+
+local function pause(object: FTObject)
+	local o = object
+	local self = o.self
+
+	if self.PlaybackState == Enum.PlaybackState.Begin then return end
+	if self.PlaybackState ~= Enum.PlaybackState.Playing then return end
+
+	if o.currentTween then
+		o.currentTween:Pause()
+	else
+		self.PlaybackState = Enum.PlaybackState.Paused
+	end
+end
+
+local function resume(object: FTObject)
+	local o = object
+	local self = o.self
+
+	if self.PlaybackState == Enum.PlaybackState.Begin then return end
+
+	if o.currentTween then
+		o.currentTween:Play()
+	else
+		self.PlaybackState = Enum.PlaybackState.Playing
+	end
+end
+
+local function cancel(object: FTObject)
+	local o = object
+	local self = o.self
+
+	if self.PlaybackState == Enum.PlaybackState.Begin then return end
+
+	if not o.currentTween then self.PlaybackState = Enum.PlaybackState.Cancelled end
+
+	if o.cancelFunc then
+		o.cancelFunc()
+		o.cancelFunc = nil
+	end
+end
 
 --[[
 	Creates a new FunctionTween table.
@@ -57,11 +279,18 @@ local function new(
 	local self = {
 		PlaybackState = Enum.PlaybackState.Begin,
 		Completed = Signal.new(),
-	}
+	} :: FunctionTween
 
-	local currentTween = nil :: Tween?
-	local cancelFunc = nil :: (() -> ())?
-	local delayedThread: thread?
+	local object = {
+		self = self,
+		func = func,
+		initialTweenInfo = initialTweenInfo,
+		tweenSignal = tweenSignal,
+
+		currentTween = nil,
+		cancelFunc = nil,
+		delayedThread = nil,
+	} :: FTObject
 
 	--[[
 		Plays the tween.
@@ -70,204 +299,39 @@ local function new(
 		@param endValue -- End Number
 		@param tweenInfo -- TweenInfo to use, overrides provided in `.new`
 	]]
-	local function play(startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
-		self.PlaybackState = Enum.PlaybackState.Begin
-
-		if cancelFunc then
-			cancelFunc()
-			cancelFunc = nil
-		end
-
-		tweenInfo = tweenInfo or initialTweenInfo
-		local actualTweenInfo = if typeof(tweenInfo) == "table" and typeof(tweenInfo.TweenInfo) == "TweenInfo"
-			then tweenInfo.TweenInfo
-			else tweenInfo
-		assert(typeof(actualTweenInfo) == "TweenInfo", "TweenInfo is missing, add TweenInfo to '.Play' or '.new'.")
-
-		local easingFunction = function(alpha: number)
-			return TweenService:GetValue(alpha, actualTweenInfo.EasingStyle, actualTweenInfo.EasingDirection)
-		end
-		if typeof(tweenInfo) == "table" and typeof(tweenInfo.EasingFunction) == "function" then
-			easingFunction = tweenInfo.EasingFunction
-		end
-
-		if tweenSignal then
-			self.PlaybackState = actualTweenInfo.DelayTime > 0 and Enum.PlaybackState.Delayed
-				or Enum.PlaybackState.Playing
-
-			local cancelDelayedThread = function()
-				if delayedThread then
-					if coroutine.status(delayedThread) == "suspended" then task.cancel(delayedThread) end
-					delayedThread = nil
-				end
-			end
-
-			cancelFunc = cancelDelayedThread
-
-			-- Thanks to MethodTween for figuring this out
-			delayedThread = delayCallback(actualTweenInfo.DelayTime, function()
-				self.PlaybackState = Enum.PlaybackState.Playing
-
-				local repeatCount = (actualTweenInfo.RepeatCount + 1) * (if actualTweenInfo.Reverses then 2 else 1)
-				local timesRepeated = 0
-
-				local _time = 0
-				local lastFrameTime = 0
-				local function tweenCallback()
-					if self.PlaybackState == Enum.PlaybackState.Cancelled then return end
-					if self.PlaybackState == Enum.PlaybackState.Completed then return end
-
-					local currentFrameTime = os.clock()
-					local deltaTime = currentFrameTime - lastFrameTime
-					lastFrameTime = currentFrameTime
-
-					if self.PlaybackState == Enum.PlaybackState.Paused then return end -- Don't want to bother disconencting
-
-					_time += deltaTime
-
-					local alpha = math.min(_time / actualTweenInfo.Time - timesRepeated, 1)
-					local tweenAlpha = easingFunction(alpha)
-					if actualTweenInfo.Reverses and timesRepeated % 2 == 1 then tweenAlpha = 1 - tweenAlpha end
-
-					func(lerp(startValue, endValue, tweenAlpha), deltaTime)
-
-					-- TODO: Make repeating more accurate to TweenService
-					if alpha >= 1 then
-						timesRepeated += 1
-					end
-
-					if timesRepeated >= repeatCount and actualTweenInfo.RepeatCount >= 0 then
-						self.PlaybackState = Enum.PlaybackState.Completed
-						if cancelFunc then
-							cancelFunc()
-							cancelFunc = nil
-						end
-					end
-				end
-
-				lastFrameTime = os.clock()
-				if typeof(tweenSignal) == "table" and (tweenSignal :: any).RenderStepName then
-					RunService:BindToRenderStep(
-						(tweenSignal :: any).RenderStepName,
-						(tweenSignal :: any).RenderPriority,
-						tweenCallback
-					)
-					cancelFunc = function()
-						RunService:UnbindFromRenderStep((tweenSignal :: any).RenderStepName)
-						cancelDelayedThread()
-					end
-				else
-					local connection = (tweenSignal :: any):Connect(tweenCallback)
-					cancelFunc = function()
-						connection:Disconnect()
-						cancelFunc = nil
-
-						self.Completed:Fire(self.PlaybackState)
-						cancelDelayedThread()
-					end
-				end
-			end)
-		else
-			local temporaryValue = Instance.new("NumberValue")
-			temporaryValue.Value = 0
-
-			local lastAlpha = 0
-			local valueChanged = temporaryValue:GetPropertyChangedSignal("Value"):Connect(function()
-				local alpha = temporaryValue.Value
-				local deltaTime = (alpha - lastAlpha) * actualTweenInfo.Time
-				lastAlpha = alpha
-
-				local tweenAlpha = easingFunction(alpha)
-				func(lerp(startValue, endValue, tweenAlpha), deltaTime)
-			end)
-
-			local linearTweenInfo = TweenInfo.new(
-				actualTweenInfo.Time,
-				-- Doing linear tween for custom Easing Function and deltaTime
-				Enum.EasingStyle.Linear,
-				Enum.EasingDirection.Out,
-
-				actualTweenInfo.RepeatCount,
-				actualTweenInfo.Reverses,
-				actualTweenInfo.DelayTime
-			)
-			local tween = TweenService:Create(temporaryValue, linearTweenInfo, {
-				Value = 1,
-			})
-			currentTween = tween
-			tween:Play()
-
-			self.PlaybackState = tween.PlaybackState
-			local playbackStateChanged = tween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
-				self.PlaybackState = tween.PlaybackState
-			end)
-
-			local tweenCompleted
-			tweenCompleted = tween.Completed:Connect(function(playbackState)
-				currentTween = nil
-				cancelFunc = nil
-
-				tweenCompleted:Disconnect()
-				playbackStateChanged:Disconnect()
-				tween:Destroy()
-				valueChanged:Disconnect()
-				temporaryValue:Destroy()
-
-				self.Completed:Fire(playbackState)
-			end)
-			cancelFunc = function()
-				tween:Cancel() -- Fires tween.Completed
-			end
-		end
+	self.Play = function(startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
+		assert(
+			typeof(startValue) == "number",
+			"startValue is not a number for FT.Play, either not provided or called using ':' instead of '.'"
+		)
+		play(object, startValue, endValue, tweenInfo)
 	end
 
 	--[[
 		Pauses the tween.
 	]]
-	local function pause()
-		if self.PlaybackState == Enum.PlaybackState.Begin then return end
-		if self.PlaybackState ~= Enum.PlaybackState.Playing then return end
-
-		if currentTween then
-			currentTween:Pause()
-		else
-			self.PlaybackState = Enum.PlaybackState.Paused
-		end
+	self.Pause = function(s: never?)
+		if s ~= nil then warn("Expected '.' not ':', FT.Pause will still work as expected.") end
+		pause(object)
 	end
 
 	--[[
 		Resumes the tween after it was paused.
 	]]
-	local function resume()
-		if self.PlaybackState == Enum.PlaybackState.Begin then return end
-
-		if currentTween then
-			currentTween:Play()
-		else
-			self.PlaybackState = Enum.PlaybackState.Playing
-		end
+	self.Resume = function(s: never?)
+		if s ~= nil then warn("Expected '.' not ':', FT.Resume will still work as expected.") end
+		resume(object)
 	end
 
 	--[[
 		Cancels the tween, it cannot be resumed.
 	]]
-	local function cancel()
-		if self.PlaybackState == Enum.PlaybackState.Begin then return end
-
-		if not currentTween then self.PlaybackState = Enum.PlaybackState.Cancelled end
-
-		if cancelFunc then
-			cancelFunc()
-			cancelFunc = nil
-		end
+	self.Cancel = function(s: never?)
+		if s ~= nil then warn("Expected '.' not ':', FT.Cancel will still work as expected.") end
+		cancel(object)
 	end
 
-	self.Play = play
-	self.Pause = pause
-	self.Resume = resume
-	self.Cancel = cancel
-
-	return self :: FunctionTween
+	return self
 end
 
 -- Instance Props and Methods to Function (Also taken from MethodTween)
