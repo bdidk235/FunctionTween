@@ -9,7 +9,7 @@ local TweenService = game:GetService("TweenService")
 local Signal = require(script.Parent.Signal)
 type Signal<T...> = Signal.Signal<T...>
 
-local SINGAL_REPEAT_RESETS_TIME = false -- More accurate to how TweenService works
+local SINGAL_REPEAT_RESETS_TIME = false
 
 function lerp(a: number, b: number, t: number)
 	return a * (1 - t) + b * t
@@ -65,8 +65,8 @@ export type FunctionTween = {
 }
 
 local function play(object: FTObject, startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
-	assert(typeof(startValue) == "number", "startValue is not a number")
-	assert(typeof(endValue) == "number", "startValue is not a number")
+	assert(typeof(startValue) == "number", "[FunctionTween]: startValue is not a number")
+	assert(typeof(endValue) == "number", "[FunctionTween]: startValue is not a number")
 	local o = object
 	local self = o.self
 
@@ -83,7 +83,7 @@ local function play(object: FTObject, startValue: number, endValue: number, twee
 		else tweenInfo
 	assert(
 		typeof(actualTweenInfo) == "TweenInfo" or typeof(actualTweenInfo) == "table",
-		"TweenInfo is missing, add TweenInfo to '.Play' or '.new'."
+		"[FunctionTween]: TweenInfo is missing, add TweenInfo to '.Play' or '.new'."
 	)
 
 	local easingFunction = function(alpha: number)
@@ -204,7 +204,7 @@ local function play(object: FTObject, startValue: number, endValue: number, twee
 		end)
 
 		local tweenCompleted
-		tweenCompleted = tween.Completed:Connect(function(playbackState)
+		local function cancel(playbackState: Enum.PlaybackState)
 			o.currentTween = nil
 			o.cancelFunc = nil
 
@@ -214,10 +214,15 @@ local function play(object: FTObject, startValue: number, endValue: number, twee
 			valueChanged:Disconnect()
 			temporaryValue:Destroy()
 
+			self.PlaybackState = playbackState
 			self.Completed:Fire(playbackState)
+		end
+		tweenCompleted = tween.Completed:Connect(function(playbackState)
+			cancel(playbackState)
 		end)
 		o.cancelFunc = function()
-			tween:Cancel() -- Fires tween.Completed
+			tween:Cancel()
+			cancel(tween.PlaybackState)
 		end
 	end
 end
@@ -302,7 +307,7 @@ local function new(
 	self.Play = function(startValue: number, endValue: number, tweenInfo: ExtendedTweenInfo?)
 		assert(
 			typeof(startValue) == "number",
-			"startValue is not a number for FT.Play, either not provided or called using ':' instead of '.'"
+			"[FunctionTween]: startValue is not a number for FT.Play, either not provided or called using ':' instead of '.'"
 		)
 		play(object, startValue, endValue, tweenInfo)
 	end
@@ -311,7 +316,7 @@ local function new(
 		Pauses the tween.
 	]]
 	self.Pause = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', FT.Pause will still work as expected.") end
+		if s ~= nil then warn("[FunctionTween]: Expected '.' not ':', FT.Pause will still work as expected.") end
 		pause(object)
 	end
 
@@ -319,7 +324,7 @@ local function new(
 		Resumes the tween after it was paused.
 	]]
 	self.Resume = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', FT.Resume will still work as expected.") end
+		if s ~= nil then warn("[FunctionTween]: Expected '.' not ':', FT.Resume will still work as expected.") end
 		resume(object)
 	end
 
@@ -327,7 +332,7 @@ local function new(
 		Cancels the tween, it cannot be resumed.
 	]]
 	self.Cancel = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', FT.Cancel will still work as expected.") end
+		if s ~= nil then warn("[FunctionTween]: Expected '.' not ':', FT.Cancel will still work as expected.") end
 		cancel(object)
 	end
 
@@ -374,7 +379,7 @@ local function LerpValue<T>(valueA: T, valueB: T, alpha: number): T
 		return Vector2int16.new(lerp(anyA.X, anyB.X, alpha), lerp(anyA.Y, anyB.Y, alpha)) :: any
 	end
 
-	error(`LerpValue: Unsupported type '{valueType}'`)
+	error(`[FunctionTween]: Unsupported lerp type '{valueType}'`)
 end
 
 --[[
@@ -395,12 +400,17 @@ local function InstanceProps(instance: Instance, props: { [string]: any })
 	local initialValues = {}
 	for name, finalValue in props do
 		local success, err = pcall(function()
-			assert(typeof(instanceAny[name]) == typeof(finalValue), "Initial and final values must be of the same type")
+			assert(
+				typeof(instanceAny[name]) == typeof(finalValue),
+				"[FunctionTween]: Initial and final values must be of the same type"
+			)
 			-- Check if prop can lerp before adding initial value
 			local _ = LerpValue(instanceAny[name], instanceAny[name], 0)
 			initialValues[name] = instanceAny[name]
 		end)
-		if not success then error(`Failed to get property '{name}' for '{instance:GetFullName()}': {err}`) end
+		if not success then
+			error(`[FunctionTween]: Failed to get property '{name}' for '{instance:GetFullName()}': {err}`)
+		end
 	end
 
 	return function(alpha: number)
@@ -411,7 +421,7 @@ local function InstanceProps(instance: Instance, props: { [string]: any })
 				instanceAny[name] = newValue
 			end)
 			if not success and not initialValue then
-				error(`Failed to set property '{name}' for '{instance:GetFullName()}': {err}`)
+				error(`[FunctionTween]: Failed to set property '{name}' for '{instance:GetFullName()}': {err}`)
 			end
 		end
 	end
@@ -435,11 +445,16 @@ local function InstanceMethods(instance: Instance, methodProps: { [string]: { an
 	for name, propData in methodProps do
 		local initialValue, finalValue = propData[1], propData[2]
 		local success, err = pcall(function()
-			assert(typeof(initialValue) == typeof(finalValue), "Initial and final values must be of the same type")
+			assert(
+				typeof(initialValue) == typeof(finalValue),
+				"[FunctionTween]: Initial and final values must be of the same type"
+			)
 			-- Check if prop can lerp
 			local _ = LerpValue(initialValue, finalValue, 0)
 		end)
-		if not success then error(`Failed to get property '{name}' for '{instance:GetFullName()}': {err}`) end
+		if not success then
+			error(`[FunctionTween]: Failed to get property '{name}' for '{instance:GetFullName()}': {err}`)
+		end
 	end
 
 	local initialValues = {}
@@ -454,7 +469,9 @@ local function InstanceMethods(instance: Instance, methodProps: { [string]: { an
 				local newValue = LerpValue(initialValue, propData[2], alpha)
 				instanceAny[name](instance, newValue)
 			end)
-			if not success then error(`Failed to set property '{name}' for '{instance:GetFullName()}': {err}`) end
+			if not success then
+				error(`[FunctionTween]: Failed to set property '{name}' for '{instance:GetFullName()}': {err}`)
+			end
 		end
 	end
 end

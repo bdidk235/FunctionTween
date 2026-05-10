@@ -34,15 +34,25 @@ export type PhysicsTween = {
 	Completed: Signal<Enum.PlaybackState>,
 }
 
-local function changeVelocties(object: Instance, velocity: Vector3, angularVelocity: Vector3)
-	if object:IsA("BasePart") then
-		object.AssemblyLinearVelocity = velocity
-		object.AssemblyAngularVelocity = angularVelocity
+local function velocitiesUpdater(model: Instance)
+	local previousCFrames = {}
+
+	if model:IsA("BasePart") then previousCFrames[model] = model.CFrame end
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BasePart") then previousCFrames[descendant] = model.CFrame end
 	end
-	for _, part in pairs(object:GetDescendants()) do
-		if part:IsA("BasePart") then
-			part.AssemblyLinearVelocity = velocity
-			part.AssemblyAngularVelocity = angularVelocity
+
+	local function updatePart(part: BasePart, deltaSpeed: number)
+		part.AssemblyLinearVelocity = (part.Position - previousCFrames[part].Position) * deltaSpeed
+		part.AssemblyAngularVelocity = Vector3.new(previousCFrames[part]:ToObjectSpace(part.CFrame):ToEulerAngles())
+			* deltaSpeed
+		previousCFrames[part] = part.CFrame
+	end
+
+	return function(deltaSpeed: number)
+		if model:IsA("BasePart") then updatePart(model, deltaSpeed) end
+		for _, descendant in model:GetDescendants() do
+			if descendant:IsA("BasePart") then updatePart(descendant, deltaSpeed) end
 		end
 	end
 end
@@ -60,14 +70,14 @@ local function pause(object: PTObject)
 	local o = object
 
 	o.tween.Pause()
-	changeVelocties(o.model, Vector3.zero, Vector3.zero)
+	o.updateVelocities(0)
 end
 
 local function cancel(object: PTObject)
 	local o = object
 
 	o.tween.Cancel()
-	changeVelocties(o.model, Vector3.zero, Vector3.zero)
+	o.updateVelocities(0)
 end
 
 --[[
@@ -80,6 +90,7 @@ end
 ]]
 local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, tweenSignal: (TweenSignal | "None")?)
 	local self = {} :: PhysicsTween
+	self.Completed = Signal.new()
 
 	local object = {
 		model = model,
@@ -87,36 +98,29 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 
 		startingCFrame = model:GetPivot(),
 		goalCFrame = CFrame.new(),
+
+		updateVelocities = velocitiesUpdater(model),
 	} :: PTObject
 
 	local lastFrameTime = nil :: number?
+	local lastDeltaTime = nil :: number?
 
 	local tween = FunctionTween.new(function(alpha, deltaTime)
 		local currentFrameTime = os.clock()
 		lastFrameTime = currentFrameTime
+		lastDeltaTime = deltaTime
 
 		local deltaSpeed = 1 / deltaTime
 
 		local newCFrame = object.startingCFrame:Lerp(object.goalCFrame, alpha)
-
-		local velocity = (newCFrame.Position - model:GetPivot().Position) * deltaSpeed
-		local angularVelocity = Vector3.new((model:GetPivot():ToObjectSpace(newCFrame)):ToEulerAngles()) * deltaSpeed
-		changeVelocties(model, velocity, angularVelocity)
-
-		if alpha == 1 then
-			task.delay(deltaTime, function()
-				if lastFrameTime ~= currentFrameTime then return end
-				changeVelocties(model, Vector3.zero, Vector3.zero)
-			end)
-		end
-
 		model:PivotTo(newCFrame)
+
+		object.updateVelocities(deltaSpeed)
 	end, initialTweenInfo, if tweenSignal ~= "None" then (tweenSignal or RunService.PreSimulation) else nil)
 
 	object.tween = tween
 	self.Resume = tween.Resume
 	self.PlaybackState = tween.PlaybackState
-	self.Completed = tween.Completed
 
 	--[[
 		Plays the tween.
@@ -127,8 +131,19 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 	self.Play = function(newGoalPivot: CFrame, tweenInfo: ExtendedTweenInfo?)
 		assert(
 			typeof(newGoalPivot) == "CFrame",
-			"newGoalPivot is not a CFrame for PT.Play, either not provided or called using ':' instead of '.'"
+			"[PhysicsTween]: newGoalPivot is not a CFrame for PT.Play, either not provided or called using ':' instead of '.'"
 		)
+		local completed
+		completed = tween.Completed:Connect(function(playbackState)
+			local currentFrameTime = lastFrameTime
+			task.delay(lastDeltaTime or 0, function()
+				if lastFrameTime ~= currentFrameTime then return end
+				object.updateVelocities(0)
+			end)
+
+			completed:Disconnect()
+			self.Complted:Fire(playbackState)
+		end)
 		play(object, newGoalPivot, tweenInfo)
 	end
 
@@ -136,7 +151,7 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 		Pauses the tween.
 	]]
 	self.Pause = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', PT.Pause will still work as expected.") end
+		if s ~= nil then warn("[PhysicsTween]: Expected '.' not ':', PT.Pause will still work as expected.") end
 		pause(object)
 	end
 
@@ -144,7 +159,7 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 		Resumes the tween after it was paused.
 	]]
 	self.Resume = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', PT.Resume will still work as expected.") end
+		if s ~= nil then warn("[PhysicsTween]: Expected '.' not ':', PT.Resume will still work as expected.") end
 		tween.Resume()
 	end
 
@@ -152,7 +167,7 @@ local function new(model: PVInstance, initialTweenInfo: ExtendedTweenInfo?, twee
 		Cancels the tween, it cannot be resumed.
 	]]
 	self.Cancel = function(s: never?)
-		if s ~= nil then warn("Expected '.' not ':', PT.Cancel will still work as expected.") end
+		if s ~= nil then warn("[PhysicsTween]: Expected '.' not ':', PT.Cancel will still work as expected.") end
 		cancel(object)
 	end
 
